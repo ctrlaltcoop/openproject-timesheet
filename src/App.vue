@@ -1,12 +1,31 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
+    <WeekPicker></WeekPicker>
+    <Timesheet></Timesheet>
   </div>
 </template>
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+import Timesheet from '@/components/Timesheet.vue';
+import WeekPicker from '@/components/WeekPicker.vue';
+import store, { STORE_TYPES } from '@/store';
+import { Route } from 'vue-router';
+
+@Component({
+  components: {
+    Timesheet,
+    WeekPicker,
+  },
+})
+export default class App extends Vue {
+  public async beforeRouteEnter(from: Route, to: Route, next: any) {
+    await store.dispatch(STORE_TYPES.FETCH_CURRENT_USER);
+    await store.dispatch(STORE_TYPES.UPDATE_TIME_ENTRIES);
+    next();
+  }
+}
+</script>
+
 
 <style lang="scss">
 #app {
