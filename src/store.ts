@@ -8,7 +8,7 @@ import { getTicketId } from './utils';
 import { __await } from 'tslib';
 
 Vue.use(Vuex);
-const opClient = axios.create({
+export const opClient = axios.create({
   baseURL: process.env.VUE_APP_OPENPROJECT_URL + '/api/v3',
 });
 

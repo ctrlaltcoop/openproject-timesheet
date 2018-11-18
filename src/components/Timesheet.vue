@@ -34,13 +34,28 @@
           @blur="createEntry($event, ticket, day)"
           type="number"
         )
-          
     .timesheet-row
+      .timesheet-cell.ticket-cell
+        Icon.add-time-entry(
+          type="md-add-circle"
+          size="20"
+          v-show="!newWorkPackageEditing"
+          @click="newWorkPackageEditing = true"
+        )
+        AutoComplete(
+          :disabled="newWorkPackageCreating"
+          v-if="newWorkPackageEditing"
+          ref="newWorkPackageInput"
+          @on-search="autocomplete"
+          @on-select="addNewWorkPackage"
+        )
+         <Option v-for="item in workPackageSuggestions" :value="item.id" :key="item.id">{{ item.id }} - {{ item.subject }}</Option>
+          
 </template>
 
 <script lang='ts'>
-import { Component, Prop, Vue } from 'vue-property-decorator';
-import { STORE_TYPES, WorkPackageStub, TimeEntry } from '@/store';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { STORE_TYPES, WorkPackageStub, TimeEntry, opClient } from '@/store';
 import { Moment } from 'moment';
 import { Getter } from 'vuex-class';
 import { DateRange } from 'moment-range';
@@ -56,14 +71,17 @@ import {
 export default class Timesheet extends Vue {
   @Getter(STORE_TYPES.GET_WPS_IN_TIME_RANGE)
 
-  private editing: number | null = null;
-  private updating: number | null = null;
-  private newEntry: string | null = null;
-  private creating: string | null = null;
-
   private getTickets!: (range: DateRange) => WorkPackageStub[];
 
+  public editing: number | null = null;
+  public updating: number | null = null;
+  public newEntry: string | null = null;
+  public creating: string | null = null;
 
+  public newWorkPackageEditing: boolean = false;
+  public newWorkPackageCreating: boolean = false;
+  public newWorkPackages: WorkPackageStub[] = [];
+  public workPackageSuggestions: any[] = [];
 
   get date() {
     return moment(this.$route.query.date).toDate();
@@ -99,9 +117,9 @@ export default class Timesheet extends Vue {
           title: item._links.workPackage.title,
           link: item._links.workPackage.href,
         };
-      }),
+      }).concat(this.newWorkPackages),
       'id',
-    );
+    )
   }
 
   public getTicketCellId(ticketId: number, day: Moment) {
@@ -118,35 +136,37 @@ export default class Timesheet extends Vue {
   }
 
   public async createEntry($event: any, ticket: WorkPackageStub, day: Moment) {
-    this.creating = this.getTicketCellId(ticket.id, day);
     const newValue = $event.target.value;
-    try {
-      await this.$store.dispatch(STORE_TYPES.CREATE_TIME_ENTRY, {
-        data: {
-          spentOn: day.format('YYYY-MM-DD'),
-          hours: numberToPtString(newValue),
-          comment: '',
-          _links: {
-            // TODO: find out how to properly set this
-            project: {
-              href: '/api/v3/projects/2',
-            },
-            workPackage: {
-              href: ticket.link,
-            },
-            activity: {
-              // TODO: find mechanism to set proper activity
-              href: '/api/v3/time_entries/activities/1',
+    if (newValue) {
+      try {
+        this.creating = this.getTicketCellId(ticket.id, day);
+        await this.$store.dispatch(STORE_TYPES.CREATE_TIME_ENTRY, {
+          data: {
+            spentOn: day.format('YYYY-MM-DD'),
+            hours: numberToPtString(newValue),
+            comment: '',
+            _links: {
+              // TODO: find out how to properly set this
+              project: {
+                href: '/api/v3/projects/2',
+              },
+              workPackage: {
+                href: ticket.link,
+              },
+              activity: {
+                // TODO: find mechanism to set proper activity
+                href: '/api/v3/time_entries/activities/1',
+              },
             },
           },
-        },
-      });
-    } catch (e) {
-      this.$Message.error('Fehler beim eintragen der Zeit');
-    } finally {
-      this.creating = null;
-      this.newEntry = null;
+        });
+      } catch (e) {
+        this.$Message.error('Fehler beim eintragen der Zeit');
+      } finally {
+        this.creating = null;
+      }
     }
+    this.newEntry = null;
   }
 
   public startEdit(id: number) {
@@ -186,6 +206,35 @@ export default class Timesheet extends Vue {
       this.updating = null;
     }
     this.editing = null;
+  }
+
+  public addNewWorkPackage(workPackageId: any) {
+    const workPackage = this.workPackageSuggestions.find((item) => item.id === workPackageId)
+    if (!workPackage) return;
+    this.newWorkPackages.push({
+      title: workPackage.subject,
+      id: workPackage.id,
+      link: workPackage._links.self.href
+    });
+    this.newWorkPackageEditing = false;
+  }
+
+  private async autocomplete(val: string) {
+    this.workPackageSuggestions = (await opClient.get('work_packages', {
+      params: {
+        filters: JSON.stringify([
+        {
+          subject: {
+            operator: "~",
+            values: [val]
+          },
+           id: {
+            operator: "=",
+            values: [val]
+          }
+        }])
+      }
+    })).data._embedded.elements
   }
 }
 </script>
