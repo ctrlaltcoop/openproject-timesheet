@@ -1,11 +1,16 @@
 import Vue from 'vue';
 import './class-component-hooks';
-import App from './App.vue';
 import router from './router';
 import store, { STORE_TYPES } from './store';
 import iView from 'iview';
+// @ts-ignore
+import locale from 'iview/dist/locale/de-DE';
+
 import 'iview/dist/styles/iview.css';
 import { ptStringToNumber, numberToPtString } from './utils';
+
+Vue.use(iView, { locale });
+
 
 Vue.config.productionTip = false;
 

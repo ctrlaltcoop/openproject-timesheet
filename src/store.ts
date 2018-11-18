@@ -5,6 +5,7 @@ import { Moment } from 'moment';
 import { moment } from './moment';
 import { DateRange } from 'moment-range';
 import { getTicketId } from './utils';
+import { __await } from 'tslib';
 
 Vue.use(Vuex);
 const opClient = axios.create({
@@ -40,17 +41,11 @@ export interface TimeEntryLinks {
   workPackage: HATEOASLink;
 }
 
-export class TimeEntry {
-  constructor(
-    public id: number,
-    public createdAt: string,
-    public spentOn: string,
-    public _links: TimeEntryLinks
-  ) {}
-
-  get ticketId() {
-    return 
-  }
+export interface TimeEntry {
+  id: number;
+  createdAt: string;
+  spentOn: string;
+  _links: TimeEntryLinks;
 }
 
 
@@ -59,6 +54,7 @@ export interface User {
 }
 
 export interface WorkPackageStub {
+  link: string;
   id: number;
   title: string;
 }
@@ -80,6 +76,10 @@ export const STORE_TYPES = {
   GET_ENTRIES_IN_TIME_RANGE: 'GET_ENTRIES_IN_TIME_RANGE',
   GET_WPS_IN_TIME_RANGE: 'GET_WPS_IN_TIME_RANGE',
   GET_ENTRIES_BY_TICKET_AND_DATE: 'GET_ENTRIES_BY_TICKET_AND_DATE',
+  PATCH_TIME_ENTRY: 'PATCH_TIME_ENTRY',
+  CREATE_TIME_ENTRY: 'CREATE_TIME_ENTRY',
+  DELETE_TIME_ENTRY: 'DELETE_TIME_ENTRY',
+  REMOVE_TIME_ENTRIES: 'REMOVE_TIME_ENTRIES',
 };
 
 const storeState: RootState = {
@@ -103,8 +103,9 @@ export const getters: GetterTree<RootState, RootState> = {
       }).map((item) => {
         return {
           id: getTicketId(item),
+          link: item._links.workPackage.href,
           title: item._links.workPackage.title,
-        }
+        };
       });
     };
   },
@@ -135,6 +136,9 @@ export const mutations: MutationTree<RootState> = {
     state.timeEntries = entries.concat(
       state.timeEntries.filter((item: TimeEntry) => !entries.find(({ id }) => item.id === id)),
     );
+  },
+  [STORE_TYPES.REMOVE_TIME_ENTRIES](state, ids: number[]) {
+    state.timeEntries = state.timeEntries.filter((item: TimeEntry) => ids.indexOf(item.id) === -1);
   },
 };
 
@@ -169,6 +173,20 @@ export const actions: ActionTree<RootState, RootState> = {
       commit(STORE_TYPES.MERGE_TIME_ENTRIES, chunk.data._embedded.elements);
     }
     return state.timeEntries;
+  },
+  async [STORE_TYPES.PATCH_TIME_ENTRY]({ state, commit }, { id, update }): Promise<TimeEntry> {
+    const updatedEntry = (await opClient.patch(`time_entries/${id}`, update)).data;
+    commit(STORE_TYPES.MERGE_TIME_ENTRIES, [updatedEntry]);
+    return updatedEntry;
+  },
+  async [STORE_TYPES.CREATE_TIME_ENTRY]({ state, commit }, { data }): Promise<TimeEntry> {
+    const newEntry = (await opClient.post(`time_entries`, data)).data;
+    commit(STORE_TYPES.MERGE_TIME_ENTRIES, [newEntry]);
+    return newEntry;
+  },
+  async [STORE_TYPES.DELETE_TIME_ENTRY]({ state, commit }, id) {
+    const response = (await opClient.delete(`time_entries/${id}`));
+    commit(STORE_TYPES.REMOVE_TIME_ENTRIES, [id]);
   },
 };
 

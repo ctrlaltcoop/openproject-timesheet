@@ -13,8 +13,7 @@ import { Getter, Mutation } from 'vuex-class';
 import { STORE_TYPES } from '@/store';
 import moment from 'moment';
 
-@Component({
-})
+@Component({})
 export default class WeekPicker extends Vue {
   get weekNumber() {
     return moment(this.selectedDate).week();
@@ -28,14 +27,13 @@ export default class WeekPicker extends Vue {
     this.$router.push({
       name: 'timesheet',
       query: {
-        date: moment(date).format('YYYY-MM-DD')
-      }
-    })
+        date: moment(date).format('YYYY-MM-DD'),
+      },
+    });
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-
 </style>

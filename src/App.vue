@@ -19,6 +19,7 @@ import { Route } from 'vue-router';
 })
 export default class App extends Vue {
   public async beforeRouteEnter(from: Route, to: Route, next: any) {
+
     await store.dispatch(STORE_TYPES.FETCH_CURRENT_USER);
     await store.dispatch(STORE_TYPES.UPDATE_TIME_ENTRIES);
     next();
