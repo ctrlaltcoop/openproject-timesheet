@@ -19,9 +19,8 @@ Vue.use(iView);
 Vue.filter('ptToNumber', ptStringToNumber);
 Vue.filter('numberToPt', numberToPtString);
 
-
 new Vue({
   router,
   store,
   render: (h) => h('router-view'),
-}).$mount('#app');
+}).$mount('#timesheet-app');
