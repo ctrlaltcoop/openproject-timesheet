@@ -1,19 +1,23 @@
 <template lang="pug">
   .week-picker
-    DatePicker(v-model="selectedDate")
-    Icon(type="md-arrow-round-back")
-    span.week-title KW {{ weekNumber }}
-    Icon(type="md-arrow-round-forward")
+    Datepicker.week-picker-input(v-model="selectedDate" :monday-first="true")
+    span.week-picker-title KW {{ weekNumber }}
 </template>
 
 <script lang="ts">
+
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { DatePicker } from 'iview';
 import { Getter, Mutation } from 'vuex-class';
 import { STORE_TYPES } from '@/store';
 import moment from 'moment';
+// @ts-ignore
+import Datepicker from 'vuejs-datepicker';
 
-@Component({})
+@Component({
+  components: {
+    Datepicker
+  }
+})
 export default class WeekPicker extends Vue {
   get weekNumber() {
     return moment(this.selectedDate).week();
@@ -36,4 +40,14 @@ export default class WeekPicker extends Vue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+  .week-picker {
+    display: flex;
+    justify-content: center;
+    .week-picker-title {
+      margin-left: 10px;
+      display: flex;
+      align-items: center;
+    }
+  }
+
 </style>

@@ -16,11 +16,16 @@ module OpenProject::Timesheet
       menu :top_menu,
         :timesheet,
         {controller: "/timesheet", action: "index"},
-        caption: "Timesheet"
+        caption: "Timesheet",
+        if: Proc.new {
+          (User.current.logged? || !Setting.login_required?) &&
+            (User.current.allowed_to?(:view_own_time_entries, nil, global: true))
+        }
     end
     initializer "timesheet.register_hooks" do
       require "open_project/timesheet/hooks"
     end
-    assets %w(timesheet/js/app.js timesheet/js/chunk-vendors.js timesheet/css/app.css timesheet/css/chunk-vendors.css)
+    # assets %w(timesheet/app.js)
+    assets %w(timesheet/js/app.js timesheet/css/app.css)
   end
 end
