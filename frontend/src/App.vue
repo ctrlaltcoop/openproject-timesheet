@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <flash-message></flash-message>
     <WeekPicker></WeekPicker>
     <Timesheet></Timesheet>
   </div>
@@ -19,6 +20,7 @@ import { Route } from 'vue-router';
 })
 export default class App extends Vue {
   public async beforeRouteEnter(from: Route, to: Route, next: any) {
+
     await store.dispatch(STORE_TYPES.FETCH_CURRENT_USER);
     await store.dispatch(STORE_TYPES.UPDATE_TIME_ENTRIES);
     next();
@@ -29,11 +31,8 @@ export default class App extends Vue {
 
 <style lang="scss">
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
 }
 #nav {
   padding: 30px;
