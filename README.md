@@ -5,6 +5,32 @@ The motivation is that while reporting and managing time expenses with openproje
 For a employee to pick sometimes dozens of work packages a day to track her time expenses it requires a lot of clicking and page reloads.
 This plugin adds a SPA time schedule for productive entering
 
+## Requirements
+
+* Modern browser, targets are lates Chrome / Firefox
+* Openproject >= 8.2.0, < 9.0.0
+
+
+## Install
+
+Go to your openproject folder and open `Gemfile.modules`
+
+Add a new line like so:
+
+```
+group :opf_plugins do
+        [...]
+        gem 'openproject-timesheet', git:  'https://github.com/ctrlaltcoop/openproject-timesheet.git', tag: '0.0.3'
+end
+```
+
+Run the asset precompiler of rails:
+```
+$ RAILS_ENV=production bin/rails assets:precompile
+```
+
+Restart your openproject (depends on deployment)
+
 ## Structure
 
 The ruby part of this app is just a wrapper putting in the vue assets into openproject context.
