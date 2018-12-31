@@ -14,7 +14,9 @@
           :value="ptToNumber(detailedTimeEntry.hours)"
           @input = "detailedTimeEntry.hours = numberToPt($event.target.value)"
       )
-      button.button.-alt-highlight.timesheet-sidebar-save-button(@click="saveTimeEntry") Speichern
+      .timesheet-sidebar-controls
+        button.button.-alt-highlight.timesheet-sidebar-save-button(@click="saveTimeEntry") Speichern
+        button.button.-alt-danger.timesheet-sidebar-delete-button(@click="deleteTimeEntry") Löschen
 </template>
 
 <script lang='ts'>
@@ -62,6 +64,16 @@ export default class TimesheetSidebar extends Vue {
     this.loading = false;
   }
 
+  async deleteTimeEntry() {
+    try {
+    await this.$store.dispatch(STORE_TYPES.DELETE_TIME_ENTRY, this.detailedTimeEntry!.id);
+    this.flash('Zeiteintrag gelöscht', 'success')
+    this.$emit('deleted', this.detailedTimeEntry);
+    } catch (e) {
+      this.flashError('Zeiteintrag konnte nicht gelöscht werden')
+    }
+  }
+
   async saveTimeEntry() {
     try {
       await this.$store.dispatch(STORE_TYPES.PATCH_TIME_ENTRY, { id: this.detailedTimeEntry!.id, update: {
@@ -79,10 +91,18 @@ export default class TimesheetSidebar extends Vue {
 
 <!-- Add 'scoped' attribute to limit CSS to this component only -->
 <style lang='scss'>
-  .timesheet-sidebar-save-button {
-    margin: 15px 0 0;
-  }
+
   .timesheet-sidebar-no-comment {
     font-style: italic;
+  }
+  .timesheet-sidebar-controls {
+    margin: 15px 0 0;
+    display: flex;
+  }
+  .timesheet-sidebar-delete-button {
+    margin: 0 0 0 auto; 
+  }
+  .timesheet-sidebar-save-button {
+    margin: 0;
   }
 </style>

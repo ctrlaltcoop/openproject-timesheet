@@ -36,7 +36,7 @@
             :render-suggestion="suggestionDisplay"
             :get-suggestion-value="getSuggestionValue"
           )
-    TimesheetSidebar(:time-entry="selectedTimeEntry" v-if="selectedTimeEntry", @saved="selected = null")
+    TimesheetSidebar(:time-entry="selectedTimeEntry" v-if="selectedTimeEntry", @saved="selected = null", @deleted="selected = null")
 </template>
 
 <script lang='ts'>
