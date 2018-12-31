@@ -90,7 +90,7 @@ export const getters: GetterTree<RootState, RootState> = {
   [STORE_TYPES.GET_ENTRIES_IN_TIME_RANGE](state): (range: DateRange) => TimeEntry[] {
     return (range: DateRange) => {
       return state.timeEntries.filter((item) => {
-        return moment(item.createdAt).within(range);
+        return moment(item.spentOn).within(range);
       });
     };
   },
@@ -198,7 +198,12 @@ export const actions: ActionTree<RootState, RootState> = {
     return newEntry;
   },
   async [STORE_TYPES.DELETE_TIME_ENTRY]({ state, commit }, id) {
-    const response = (await opClient.delete(`time_entries/${id}`));
+    const response = (await opClient.delete(`time_entries/${id}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: {},
+    }));
     if (response.status === 204) {
       commit(STORE_TYPES.REMOVE_TIME_ENTRIES, [id]);
     } else {

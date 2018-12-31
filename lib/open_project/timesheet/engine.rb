@@ -25,7 +25,6 @@ module OpenProject::Timesheet
     initializer "timesheet.register_hooks" do
       require "open_project/timesheet/hooks"
     end
-    # assets %w(timesheet/app.js)
     assets %w(timesheet/js/app.js timesheet/css/app.css)
   end
 end
