@@ -20,3 +20,8 @@ After changes to the frontend it has to be rebuilt with `npm run build` from the
 Well this piece of software is a product of the control.alt.coop eG. While you can use, alter and redistribute it free of charge (MIT License) we do not consider it to be under "active development / maintenance" as it mainly fits a company-internal use case. In any case we are available for contract work to adjust and maintain this or any other piece of software. Contact us at [https://ctrl.alt.coop/en/contact](https://ctrl.alt.coop/en/contact)
 
 Nevertheless PRs are welcomed and handled - of course.
+
+
+## Known issues
+
+* Any created item will have activity with `id = 1`, that's because there is no way to get these via API: https://community.openproject.com/projects/openproject/work_packages/29296
