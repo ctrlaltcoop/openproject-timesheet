@@ -5,6 +5,12 @@ The motivation is that while reporting and managing time expenses with openproje
 For a employee to pick sometimes dozens of work packages a day to track her time expenses it requires a lot of clicking and page reloads.
 This plugin adds a SPA time schedule for productive entering
 
+## Demo
+
+Short usage demo
+
+[[Timesheet demo](./demo.gif)
+
 ## Requirements
 
 * Modern browser, targets are lates Chrome / Firefox
