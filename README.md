@@ -9,7 +9,7 @@ This plugin adds a SPA time schedule for productive entering
 
 Short usage demo
 
-[[Timesheet demo](./demo.gif)
+[Timesheet demo](./demo.gif)
 
 ## Requirements
 
